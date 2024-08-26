@@ -6,11 +6,53 @@ use strict;
 use Exporter 'import';
 
 our %EXPORT_TAGS = (
-    subs => qw( read ),
+    subs => qw ( load_file ),
 );
 
-sub read () {
-    return "I am a read function\n";
+my %data = ();
+
+sub load_file ($filename) {
+    open(my $fh_in, '<', $filename) or die ("Could not open file: $filename");
+    
+    while (my $line = readline($fh_in)) {
+        print $line;           
+    }
+}
+
+sub get_header () {
+    if (%data) {
+        # give back data{'header'}
+    }
+    else {
+        die ("File needs to be loaded first");
+    }
+}
+
+sub get_question_num () {
+    if (%data) {
+        # give back data{'header'}
+    }
+    else {
+        die ("File needs to be loaded first");
+    }
+}
+
+sub get_answers ($question) {
+    if (%data) {
+        # give back data{'header'}
+    }
+    else {
+        die ("File needs to be loaded first");
+    }
+}
+
+sub get_question() {
+    if (%data) {
+        # give back data{'header'}
+    }
+    else {
+        die ("File needs to be loaded first");
+    }
 }
 
 1;
