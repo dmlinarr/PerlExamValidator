@@ -10,13 +10,16 @@ our %EXPORT_TAGS = (
         $QUESTION_DETECT_REGEX 
         $ANSWER_DETECT_REGEX
 
+        $QUESTION_PATTERN_REGEX
         $ANSWER_PATTERN_REGEX
+        ...
     ),
 );
 
 our $QUESTION_DETECT_REGEX = qr{^\d+\.};
 our $ANSWER_DETECT_REGEX = qr{\[[X ]\]};
 
+our $QUESTION_PATTERN_REGEX = qr{^\d+};
 our $ANSWER_PATTERN_REGEX = qr{\[X\](.*)};
 
 1;

@@ -1,13 +1,28 @@
 use strict;
 use warnings;
 use v5.36;
+use List::Util 'shuffle';
 use lib './lib';
 
 use Exam_Reader ':subs';
- 
-Exam_Reader::load_file($ARGV[0]);
+use Exam_Writer ':subs';
+use Regex ':regex';
 
-print "Total Questions: ", Exam_Reader::get_question_total(), "\n";
-print "Question 10: ", Exam_Reader::get_question(10), "\n";
-print "Answers 10:", Exam_Reader::get_answers(10), "\n";
-print "Right answer 10: ", Exam_Reader::get_right_answer(10), "\n";
+use Data::Show;
+ 
+sub create_random_exam {
+    my @num_bucket = shuffle(1 .. Exam_Reader::get_question_total());
+    my $count = 1; 
+    
+    while (my $num = shift (@num_bucket)) {  
+        my $question = Exam_Reader::get_question($num);
+        my @random_answers = shuffle(Exam_Reader::get_answers($num));
+        
+        $question =~ s{$Regex::QUESTION_PATTERN_REGEX}{$count++}e;
+        Exam_Writer::write_one_question($question, @random_answers);
+    }
+}
+
+Exam_Reader::load_file($ARGV[0]);
+Exam_Writer::load_file("random_exam.txt");
+create_random_exam();
