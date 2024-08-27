@@ -6,9 +6,17 @@ use strict;
 use Exporter 'import';
 
 our %EXPORT_TAGS = (
-    regex => qw ( $REGEX ),
+    regex => qw ( 
+        $QUESTION_DETECT_REGEX 
+        $ANSWER_DETECT_REGEX
+
+        $ANSWER_PATTERN_REGEX
+    ),
 );
 
-our $REGEX = "I am a regex\n";
+our $QUESTION_DETECT_REGEX = qr{^\d+\.};
+our $ANSWER_DETECT_REGEX = qr{\[[X ]\]};
+
+our $ANSWER_PATTERN_REGEX = qr{\[X\](.*)};
 
 1;
