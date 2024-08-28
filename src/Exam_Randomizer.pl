@@ -2,13 +2,14 @@ use strict;
 use warnings;
 use v5.36;
 use List::Util 'shuffle';
+use POSIX 'strftime';
 use lib './lib';
 
 use Exam_Reader ':subs';
 use Exam_Writer ':subs';
 use Regex ':regex';
 
-use Data::Show;
+
  
 sub create_random_exam {
     Exam_Writer::write_other(Exam_Reader::get_other());
@@ -27,6 +28,14 @@ sub create_random_exam {
     }
 }
 
+my $exam_name = strftime('%Y%m%d-%H%M%S-', localtime());
+if ($ARGV[0] =~ $Regex::FILENAME_PATTERN_REGEX) {
+    $exam_name .= "$1";
+} 
+else {
+    warn "No match found for the filename pattern.\n";
+}
+
 Exam_Reader::load_file($ARGV[0]);
-Exam_Writer::load_file("random_exam.txt");
+Exam_Writer::load_file("hello.txt");
 create_random_exam();

@@ -48,6 +48,7 @@ sub load_file ($filename) {
             push (@intro_outro, $line);
         }
     }
+    show @intro_outro;
 }
 
 sub get_question_total () {

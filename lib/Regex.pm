@@ -13,6 +13,8 @@ our %EXPORT_TAGS = (
         
         $QUESTION_PATTERN_REGEX
         $ANSWER_PATTERN_REGEX
+        $FILENAME_PATTERN_REGEX
+        ...
     ),
 );
 
@@ -22,5 +24,6 @@ our $ANSWER_DETECT_REGEX = qr{\[[X ]\]};
 
 our $QUESTION_PATTERN_REGEX = qr{^\d+};
 our $ANSWER_PATTERN_REGEX = qr{\[X\](.*)};
+our $FILENAME_PATTERN_REGEX = qr{([^/]+)$};
 
 1;
