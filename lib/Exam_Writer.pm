@@ -9,7 +9,7 @@ our %EXPORT_TAGS = (
     subs => qw( 
         load_file 
         write_one_question 
-        ...
+        write_other
     ), 
 );
 
@@ -20,13 +20,21 @@ sub load_file ($filename) {
     open ($fh_out, '>', $path) or die ("Could not create file: $filename");
 }
 
+sub write_other ($other) {
+    if (defined $fh_out) {
+        print ($fh_out $other);
+    } 
+    else {
+        die ("File handle is not opened.");
+    }
+}
+
 sub write_one_question ($question, @answers) {
     if (defined $fh_out) {
-        print ($fh_out $question, "\n");
+        print ($fh_out $question);
         for my $answer (@answers) {
-            print ($fh_out $answer, "\n");
+            print ($fh_out $answer);
         }
-        print ($fh_out "\n");
     } 
     else {
         die ("File handle is not opened.");

@@ -11,6 +11,8 @@ use Regex ':regex';
 use Data::Show;
  
 sub create_random_exam {
+    Exam_Writer::write_other(Exam_Reader::get_other());
+    
     my @num_bucket = shuffle(1 .. Exam_Reader::get_question_total());
     my $count = 1; 
     
@@ -19,7 +21,9 @@ sub create_random_exam {
         my @random_answers = shuffle(Exam_Reader::get_answers($num));
         
         $question =~ s{$Regex::QUESTION_PATTERN_REGEX}{$count++}e;
+        $question .= Exam_Reader::get_other();
         Exam_Writer::write_one_question($question, @random_answers);
+        for (1..4) {Exam_Writer::write_other(Exam_Reader::get_other());}
     }
 }
 
