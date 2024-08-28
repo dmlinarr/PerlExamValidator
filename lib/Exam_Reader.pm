@@ -7,7 +7,6 @@ use Exporter 'import';
 use lib './lib';
 
 use Regex ':regex';
-use Data::Show;
 
 our %EXPORT_TAGS = (
     subs => qw( 
@@ -16,39 +15,76 @@ our %EXPORT_TAGS = (
         get_answers
         get_question
         get_right_answer
-        get_intro
+        get_layout
         ... 
     ),
 );
 
-my @intro_outro = ();
+my @layouts = ();
 my @questions = ();
 my %answers = ();
 
 sub load_file ($filename) {
     open (my $fh_in, '<', $filename) or die ("Could not open file: $filename");
-    my $question = undef;
-
+    
     while (my $line = readline($fh_in)) {
-        if ($line =~ $Regex::QUESTION_START_DETECT_REGEX) {
-            $question = $line;
-            while ($question !~ $Regex::QUESTION_END_DETECT_REGEX) {
-                $question .= readline($fh_in);
+        
+        if ($line =~ $Regex::STARTLINE_DETECT_REGEX) {
+            my ($layout,$question,$position);
+            
+            while ($line !~ $Regex::QUESTION_START_DETECT_REGEX) {
+                $layout .= $line;
+                $line = readline ($fh_in);
             }
-            push (@questions, $question); 
+            $layout .= "Q";
+
+            while ($line !~ $Regex::QUESTION_END_DETECT_REGEX) {
+                $question .= $line;
+                $line = readline ($fh_in);
+            }
+
+            while ($line !~ $Regex::ANSWER_START_DETECT_REGEX) {
+                $layout .= $line;
+                $line = readline ($fh_in);
+            }
+            $layout .= "A";
+            
+            while ($line !~ $Regex::ANSWER_END_DETECT_REGEX) {
+                $line =~ s{$Regex::ANSWER_PATTERN_REGEX}{[ ]$1};
+                push (@{$answers{$question}}, $line);
+                $line = readline ($fh_in);
+            }
+            
+            while ($line !~ qr{$Regex::STARTLINE_DETECT_REGEX|$Regex::ENDLINE_DETECT_REGEX}) {
+                $layout .= $line;
+                $position = tell($fh_in);
+                $line = readline ($fh_in);
+            }
+            seek ($fh_in,$position,0);
+
+            push (@questions, $question);
+            push (@layouts, $layout);
         }
-        elsif ($line =~$Regex::ANSWER_DETECT_REGEX and defined $question) {
-            $line =~ s{$Regex::ANSWER_PATTERN_REGEX}{[ ]$1};
-            push (@{$answers{$question}}, $line);   
-        }
-        elsif (not defined $question) {
-            $intro_outro[0] .= $line;
+        elsif ($line =~ $Regex::ENDLINE_DETECT_REGEX) {
+            my $outro = $line;
+            while ($line = readline($fh_in)) {
+                $outro .= $line;
+            }
+            
+            push (@layouts, $outro);
         }
         else {
-            push (@intro_outro, $line);
+            my ($intro,$position);
+            while ($line !~ $Regex::STARTLINE_DETECT_REGEX) {
+                $intro .= $line;
+                $position = tell($fh_in);
+                $line = readline ($fh_in);
+            }
+            seek ($fh_in,$position,0);
+            
+            push (@layouts, $intro);
         }
     }
-    show @intro_outro;
 }
 
 sub get_question_total () {
@@ -89,9 +125,9 @@ sub get_question ($num) {
     }
 }
 
-sub get_other () {
-    if (@intro_outro) {
-        return shift (@intro_outro);    
+sub get_layout ($num) {
+    if (@layouts) {
+        return $layouts[$num];    
     }
     else {
         die ("File not loaded yet");
