@@ -19,8 +19,8 @@ sub create_random_exam ($reader){
     
     while (my $num = shift (@num_bucket)) {  
         my $layout = $reader->get_layout($num);
-        my $question = $reader->get_question($num);
-        my @random_answers = shuffle($reader->get_answers($num));
+        my $question = $reader->get_question_pretty($num);
+        my @random_answers = shuffle($reader->get_answers_pretty($num));
         
         $question =~ s{$Regex::QUESTION_PATTERN_REGEX}{$count++}e;
         Exam_Writer::write_one_question($layout, $question, @random_answers);
