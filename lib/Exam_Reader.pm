@@ -14,7 +14,7 @@ our %EXPORT_TAGS = (
         get_question_total
         get_answers
         get_question
-        get_right_answer
+        get_marked_answer
         get_layout
         ... 
     ),
@@ -22,6 +22,7 @@ our %EXPORT_TAGS = (
 
 my @layouts = ();
 my @questions = ();
+my %marked_answer = ();
 my %answers = ();
 
 sub load_file ($filename) {
@@ -50,7 +51,11 @@ sub load_file ($filename) {
             $layout .= "A";
             
             while ($line !~ $Regex::ANSWER_END_DETECT_REGEX) {
-                $line =~ s{$Regex::ANSWER_PATTERN_REGEX}{[ ]$1};
+                if ($line =~ $Regex::ANSWER_PATTERN_REGEX){
+                    push (@{$marked_answer{$question}}, $line);
+                    $line =~ s{$Regex::ANSWER_PATTERN_REGEX}{[ ]$1};
+                }
+                
                 push (@{$answers{$question}}, $line);
                 $line = readline ($fh_in);
             }
@@ -96,10 +101,10 @@ sub get_question_total () {
     }
 }
 
-sub get_right_answer ($num) {
-    if (%answers) {
-        my @ans = get_answers ($num);
-        return $ans[0];    
+sub get_marked_answer ($num) {
+    if (%marked_answer) {
+        my $question = get_question ($num);
+        return @{$marked_answer{$question}};    
     }
     else {
         die ("File not loaded yet");

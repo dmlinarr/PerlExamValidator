@@ -1,1 +1,5 @@
-This is my final project for the perl module
+### Main task (part 1a)
+
+```bash
+perl src/Exam_Randomizer.pl resource/normal-exam/IntroPerlEntryExam.txt
+```

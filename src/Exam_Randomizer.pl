@@ -9,8 +9,6 @@ use Exam_Reader ':subs';
 use Exam_Writer ':subs';
 use Regex ':regex';
 
-
- 
 sub create_random_exam {
     my $question_num = Exam_Reader::get_question_total();
     my @num_bucket = shuffle(1 .. $question_num);
