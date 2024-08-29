@@ -20,7 +20,7 @@ our %EXPORT_TAGS = (
         
         $FILENAME_PATTERN_REGEX
         $LAYOUTSPLIT_PATTERN_REGEX
-        ... 
+        ...
     ),
 );
 
