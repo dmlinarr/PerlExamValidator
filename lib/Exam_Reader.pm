@@ -8,24 +8,21 @@ use lib './lib';
 
 use Regex ':regex';
 
-our %EXPORT_TAGS = (
-    subs => qw( 
-        load_file
-        get_question_total
-        get_answers
-        get_question
-        get_marked_answer
-        get_layout
-        ... 
-    ),
-);
+sub new ($class,$filename) {
+    my $self = {
+        class         => $class,
+        layouts       => [],
+        questions     => [],
+        marked_answer => {},
+        answers       => {},
+    };
+    
+    my $reader = bless ($self, $class);
+    load_file($reader,$filename);
+    return $reader;
+}
 
-my @layouts = ();
-my @questions = ();
-my %marked_answer = ();
-my %answers = ();
-
-sub load_file ($filename) {
+sub load_file ($self,$filename) {
     open (my $fh_in, '<', $filename) or die ("Could not open file: $filename");
     
     while (my $line = readline($fh_in)) {
@@ -52,11 +49,11 @@ sub load_file ($filename) {
             
             while ($line !~ $Regex::ANSWER_END_DETECT_REGEX) {
                 if ($line =~ $Regex::ANSWER_PATTERN_REGEX){
-                    push (@{$marked_answer{$question}}, $line);
+                    push (@{$self->{marked_answer}{$question}}, $line);
                     $line =~ s{$Regex::ANSWER_PATTERN_REGEX}{[ ]$1};
                 }
                 
-                push (@{$answers{$question}}, $line);
+                push (@{$self->{answers}{$question}}, $line);
                 $line = readline ($fh_in);
             }
             
@@ -67,8 +64,8 @@ sub load_file ($filename) {
             }
             seek ($fh_in,$position,0);
 
-            push (@questions, $question);
-            push (@layouts, $layout);
+            push (@{$self->{questions}}, $question);
+            push (@{$self->{layouts}}, $layout);
         }
         elsif ($line =~ $Regex::ENDLINE_DETECT_REGEX) {
             my $outro = $line;
@@ -76,7 +73,7 @@ sub load_file ($filename) {
                 $outro .= $line;
             }
             
-            push (@layouts, $outro);
+            push (@{$self->{layouts}}, $outro);
         }
         else {
             my ($intro,$position);
@@ -87,56 +84,31 @@ sub load_file ($filename) {
             }
             seek ($fh_in,$position,0);
             
-            push (@layouts, $intro);
+            push (@{$self->{layouts}}, $intro);
         }
     }
 }
 
-sub get_question_total () {
-    if (@questions) {
-        return scalar (@questions);    
-    }
-    else {
-        die ("File not loaded yet");
-    }
+sub get_question_total ($self) {
+    return scalar(@{$self->{questions}});
 }
 
-sub get_marked_answer ($num) {
-    if (%marked_answer) {
-        my $question = get_question ($num);
-        return @{$marked_answer{$question}};    
-    }
-    else {
-        die ("File not loaded yet");
-    }
+sub get_marked_answer ($self,$num) {
+    my $question = $self->get_question($num);
+    return @{$self->{marked_answer}{$question}};
 }
 
-sub get_answers ($num) {
-    if (%answers) {
-        my $question = get_question ($num);
-        return @{$answers{$question}};    
-    }
-    else {
-        die ("File not loaded yet");
-    }
+sub get_answers ($self,$num) {
+    my $question = $self->get_question($num);
+    return @{$self->{answers}{$question}};
 }
 
-sub get_question ($num) {
-    if (@questions) {
-        return $questions[$num-1];    
-    }
-    else {
-        die ("File not loaded yet");
-    }
+sub get_question ($self,$num) {
+    return $self->{questions}[$num - 1];
 }
 
-sub get_layout ($num) {
-    if (@layouts) {
-        return $layouts[$num];    
-    }
-    else {
-        die ("File not loaded yet");
-    }
+sub get_layout ($self,$num) {
+    return $self->{layouts}[$num];
 }
 
 1;
