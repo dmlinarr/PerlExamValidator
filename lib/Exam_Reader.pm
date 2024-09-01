@@ -11,6 +11,7 @@ use Regex ':regex';
 sub new ($class,$filename) {
     my $self = {
         class         => $class,
+        filename      => $filename,
         layouts       => [],
         questions     => [],
         marked_answer => {},
@@ -33,41 +34,46 @@ sub load_file ($self,$filename) {
             while ($line !~ $Regex::QUESTION_START_DETECT_REGEX) {
                 $layout .= $line;
                 $line = readline ($fh_in);
+                last unless defined $line;
             }
-            $layout .= "Q";
+            $layout .= "Q" if defined ($line);
 
-            while ($line !~ $Regex::QUESTION_END_DETECT_REGEX) {
+            while (defined($line) && $line !~ $Regex::QUESTION_END_DETECT_REGEX) {
                 $question .= $line;
                 $line = readline ($fh_in);
+                last unless defined $line;
             }
 
-            while ($line !~ $Regex::ANSWER_START_DETECT_REGEX) {
+            while (defined($line) && $line !~ $Regex::ANSWER_START_DETECT_REGEX) {
                 $layout .= $line;
                 $line = readline ($fh_in);
+                last unless defined $line;
             }
-            $layout .= "A";
+            $layout .= "A" if defined ($line);
             
-            while ($line !~ $Regex::ANSWER_END_DETECT_REGEX) {
+            while (defined($line) && $line !~ $Regex::ANSWER_END_DETECT_REGEX) {
                 my $press_question = get_pressed($question);
                 
                 if ($line =~ $Regex::ANSWER_PATTERN_REGEX){
-                    push (@{$self->{marked_answer}{$press_question}}, $line);
+                    push (@{$self->{marked_answer}{$press_question}}, $line) if defined ($press_question);;
                     $line =~ s{$Regex::ANSWER_PATTERN_REGEX}{[ ]$1};
                 }
 
-                push (@{$self->{answers}{$press_question}}, $line);
+                push (@{$self->{answers}{$press_question}}, $line) if defined ($press_question);
                 $line = readline ($fh_in);
+                last unless defined $line;
             }
             
-            while ($line !~ qr{$Regex::STARTLINE_DETECT_REGEX|$Regex::ENDLINE_DETECT_REGEX}) {
+            while (defined($line) && $line !~ qr{$Regex::STARTLINE_DETECT_REGEX|$Regex::ENDLINE_DETECT_REGEX}) {
                 $layout .= $line;
                 $position = tell($fh_in);
                 $line = readline ($fh_in);
+                last unless defined $line;
             }
-            seek ($fh_in,$position,0);
+            seek ($fh_in,$position,0) if defined ($line);
 
-            push (@{$self->{questions}}, $question);
-            push (@{$self->{layouts}}, $layout);
+            push (@{$self->{questions}}, $question) if defined ($question);
+            push (@{$self->{layouts}}, $layout) if defined ($layout);
         }
         elsif ($line =~ $Regex::ENDLINE_DETECT_REGEX) {
             my $outro = $line;
@@ -75,18 +81,19 @@ sub load_file ($self,$filename) {
                 $outro .= $line;
             }
             
-            push (@{$self->{layouts}}, $outro);
+            push (@{$self->{layouts}}, $outro) if defined ($outro);
         }
         else {
             my ($intro,$position);
-            while ($line !~ $Regex::STARTLINE_DETECT_REGEX) {
+            while (defined($line) && $line !~ $Regex::STARTLINE_DETECT_REGEX) {
                 $intro .= $line;
                 $position = tell($fh_in);
                 $line = readline ($fh_in);
+                last unless defined $line;
             }
-            seek ($fh_in,$position,0);
+            seek ($fh_in,$position,0) if defined ($line);
             
-            push (@{$self->{layouts}}, $intro);
+            push (@{$self->{layouts}}, $intro) if defined ($intro);
         }
     }
 }
@@ -138,6 +145,10 @@ sub get_pressed ($string) {
         warn ("String: $string not modified");
     }
     return $press;
+}
+
+sub get_filename ($self) {
+    return $self->{'filename'};
 }
 
 1;

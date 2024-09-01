@@ -26,10 +26,10 @@ our %EXPORT_TAGS = (
     ),
 );
 
-our $QUESTION_START_DETECT_REGEX = qr{^\d+\.};
+our $QUESTION_START_DETECT_REGEX = qr{^\s*\d+\.};
 our $QUESTION_END_DETECT_REGEX = qr{^\s*$};
 our $QUESTION_PATTERN_REGEX = qr{^\d+};
-our $QUESTION_PRESS_REGEX = qr{^\d+\.\s*|\s+};
+our $QUESTION_PRESS_REGEX = qr{\s*\d+\.\s*|\s+};
 
 our $ANSWER_START_DETECT_REGEX = qr{\[[X ]\]};
 our $ANSWER_END_DETECT_REGEX = qr{^\s*$};

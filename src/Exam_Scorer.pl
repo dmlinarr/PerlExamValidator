@@ -26,7 +26,11 @@ sub print_score () {
                     $student_score++;
                 }
             }
-            print ("...........$student_score/$question_num\n");
+
+            my $filename = $student->get_filename();
+            my $final_score = $student_score . "/" . $question_num;
+            my $output = $filename . ('.' x (80-length($filename)-length($final_score))) . $final_score;
+            print "$output\n";
         }
     }
     else {
@@ -60,8 +64,8 @@ sub read_in_files (@inputs) {
     return @files;
 }
 
-$ARGV[0] = 'resource/normal-exam/IntroPerlEntryExam.txt'; 
-$ARGV[1] = 'resource/normal-exam/Arnold_Jenny.txt';
+# $ARGV[0] = 'resource/short-exam/IntroPerlEntryExamShort.txt'; 
+# $ARGV[1] = 'resource/short-exam/IntroPerlEntryExamShort.txt';
 
 my $master_file = $ARGV[0];
 my @students_files = read_in_files(@ARGV[1..scalar(@ARGV)-1]);
