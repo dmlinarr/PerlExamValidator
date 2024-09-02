@@ -22,7 +22,7 @@ sub print_score () {
                 my @student_answer = $student->get_marked_answer_pressed($question_pressed);
                 my @master_answer = $master->get_marked_answer_pressed($question_pressed);
                 
-                if (scalar(@student_answer) == 1 && $master_answer[0] eq $student_answer[0]) {
+                if (scalar(@student_answer) == 1 && scalar(@master_answer) == 1 && $master_answer[0] eq $student_answer[0]) {
                     $student_score++;
                 }
             }
@@ -64,8 +64,9 @@ sub read_in_files (@inputs) {
     return @files;
 }
 
-# $ARGV[0] = 'resource/short-exam/IntroPerlEntryExamShort.txt'; 
-# $ARGV[1] = 'resource/short-exam/IntroPerlEntryExamShort.txt';
+# $ARGV[0] = 'resource/normal-exam/IntroPerlEntryExam.txt'; 
+# $ARGV[1] = 'resource/normal-exam/Wagner_Caro.txt';
+
 
 my $master_file = $ARGV[0];
 my @students_files = read_in_files(@ARGV[1..scalar(@ARGV)-1]);

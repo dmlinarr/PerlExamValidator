@@ -103,15 +103,25 @@ sub get_question_total ($self) {
 }
 
 sub get_marked_answer_pressed ($self,$question) {
-    my @marked_answers = @{$self->{marked_answer}{$question}}; 
-    my @pressed_answers = map { get_pressed($_) } @marked_answers;
+    my @pressed_answers = ();
+    
+    if (exists $self->{marked_answer}{$question}) {
+        my @marked_answers = @{$self->{marked_answer}{$question}};
+        @pressed_answers = map { get_pressed($_) } @marked_answers;
+    }
+     
     return @pressed_answers;
 }
 
 sub get_answers_pretty ($self,$num) {
     my $question = $self->get_question_pretty($num);
-    $question = get_pressed($question);
-    return @{$self->{answers}{$question}};
+    if (defined $question) {
+        $question = get_pressed($question);
+        return @{$self->{answers}{$question}};
+    }
+    else {
+        return ();
+    }
 }
 
 sub get_answers_pressed ($self,$num) {
@@ -121,16 +131,31 @@ sub get_answers_pressed ($self,$num) {
 } 
 
 sub get_question_pretty ($self,$num) {
-    return $self->{questions}[$num - 1];
+    if (defined $self->{questions}[$num - 1]) {
+        return $self->{questions}[$num - 1];
+    } 
+    else {
+        return undef; 
+    }
 }
 
 sub get_question_pressed ($self,$num) {
     my $question = get_question_pretty ($self,$num);
-    return get_pressed($question);
+    if (defined $question) {
+        return get_pressed($question);
+    }
+    else {
+        return undef;
+    }
 }
 
 sub get_layout ($self,$num) {
-    return $self->{layouts}[$num];
+    if (defined $self->{layouts}[$num]) {
+        return $self->{layouts}[$num];
+    }
+    else {
+        return undef;
+    }
 }
 
 sub get_pressed ($string) {
