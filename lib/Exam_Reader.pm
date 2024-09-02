@@ -158,6 +158,14 @@ sub get_layout ($self,$num) {
     }
 }
 
+sub has_question ($self,$string) {
+    return grep {$_ eq $string} @{$self->{questions}};
+}
+
+sub get_filename ($self) {
+    return $self->{'filename'};
+}
+
 sub get_pressed ($string) {
     my $press = $string;
     if ($string =~ $Regex::ANSWER_START_DETECT_REGEX) {
@@ -170,10 +178,6 @@ sub get_pressed ($string) {
         warn ("String: $string not modified");
     }
     return $press;
-}
-
-sub get_filename ($self) {
-    return $self->{'filename'};
 }
 
 1;
