@@ -31,10 +31,10 @@ our $QUESTION_END_DETECT_REGEX = qr{^\s*$};
 our $QUESTION_PATTERN_REGEX = qr{^\d+};
 our $QUESTION_PRESS_REGEX = qr{\s*\d+\.\s*|\s+};
 
-our $ANSWER_START_DETECT_REGEX = qr{\[\s*\S\s*\]};
+our $ANSWER_START_DETECT_REGEX = qr{\[\s*.\s*\]|\[\s*\]};
 our $ANSWER_END_DETECT_REGEX = qr{^\s*$};
 our $ANSWER_PATTERN_REGEX = qr{\[\s*\S\s*\](.*)};
-our $ANSWER_PRESS_REGEX = qr{\s*\[\s*\S\s*\]\s*|\s+};
+our $ANSWER_PRESS_REGEX = qr{\s*\[\s*\S?\s*\]\s*|\s+};
 
 our $STARTLINE_DETECT_REGEX = qr{^_{2,}$};
 our $ENDLINE_DETECT_REGEX = qr{^={2,}$};

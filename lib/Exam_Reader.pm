@@ -10,12 +10,13 @@ use Regex ':regex';
 
 sub new ($class,$filename) {
     my $self = {
-        class         => $class,
-        filename      => $filename,
-        layouts       => [],
-        questions     => [],
-        marked_answer => {},
-        answers       => {},
+        class           => $class,
+        filename        => $filename,
+        layouts         => [],
+        questions       => [],
+        marked_answer   => {},
+        answers         => {},
+        answers_pretty  => {},
     };
     
     my $reader = bless ($self, $class);
@@ -60,6 +61,8 @@ sub load_file ($self,$filename) {
                 }
 
                 push (@{$self->{answers}{$press_question}}, $line) if defined ($press_question);
+                $self->{answers_pretty}{get_pressed($line)} = $line if defined ($press_question);
+
                 $line = readline ($fh_in);
                 last unless defined $line;
             }
@@ -128,7 +131,17 @@ sub get_answers_pressed ($self,$num) {
     my @answers = get_answers_pretty ($self,$num);
     my @pressed_answers = map { get_pressed($_) } @answers;
     return @pressed_answers;
-} 
+}
+
+sub reverse_answer_to_pretty ($self,$pressed_answer) {
+    my $answer_pretty = undef;
+    
+    if (exists $self->{answers_pretty}{$pressed_answer}) {
+        $answer_pretty = $self->{answers_pretty}{$pressed_answer};
+    }
+     
+    return $answer_pretty;
+}
 
 sub get_question_pretty ($self,$num) {
     if (defined $self->{questions}[$num - 1]) {
@@ -159,7 +172,14 @@ sub get_layout ($self,$num) {
 }
 
 sub has_question ($self,$string) {
-    return grep {$_ eq $string} @{$self->{questions}};
+    if (grep {$_ eq $string} keys %{$self->{answers}}) {
+        my @answers = @{$self->{answers}{$string}};
+        my @pressed_answers = map { get_pressed($_) } @answers;
+        return @pressed_answers; 
+    }
+    else {
+        return ();
+    }
 }
 
 sub get_filename ($self) {

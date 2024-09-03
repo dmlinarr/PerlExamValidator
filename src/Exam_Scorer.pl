@@ -14,29 +14,42 @@ my @students = ();
 sub print_score () {
     if ($master && @students) {
         (my $assessment, my %missing_questions, my %missing_answers);
-        
+         my $question_num = $master->get_question_total();
+
         for my $student (@students) {
-            my $question_num = $master->get_question_total();
             my $student_questions = 0;
             my $student_score = 0;
 
             for my $num (1 .. $question_num) {
-                my $question = $master->get_question_pretty($num);
                 my $question_pressed = $master->get_question_pressed($num);
-                my @student_answer = $student->get_marked_answer_pressed($question_pressed);
-                my @master_answer = $master->get_marked_answer_pressed($question_pressed);
                 
-                if (scalar(@student_answer) == 1) {
+                my @student_answers_marked = $student->get_marked_answer_pressed($question_pressed);
+                my @master_answers_marked = $master->get_marked_answer_pressed($question_pressed);
+                
+                if (scalar(@student_answers_marked) == 1) {
                     $student_questions++;
-                    if ($master_answer[0] eq $student_answer[0]) {
+                    if ($master_answers_marked[0] eq $student_answers_marked[0]) {
                         $student_score++;
                     }
                 }
                 
-                if (not $student->has_question($question)) {
+                
+                if (my @student_answers_pressed = $student->has_question($question_pressed)) {
+                    my @master_answers_pressed = $master->get_answers_pressed($num);
+                    
+                    for my $answer (@master_answers_pressed) {
+                        unless (grep { $_ eq $answer } @student_answers_pressed) {
+                            my $filename = $student->get_filename();
+                            my $answer_pretty = $master->reverse_answer_to_pretty($answer);            
+                            push (@{$missing_answers{$filename}}, $answer_pretty);
+                        }
+                    }
+                }
+                else {
                     my $filename = $student->get_filename();        
+                    my $question = $master->get_question_pretty($num);
                     push (@{$missing_questions{$filename}}, $question);
-                } 
+                }
             }
 
             my $filename = $student->get_filename();
@@ -46,10 +59,19 @@ sub print_score () {
         }
         print $assessment;
         print '#' x 80 . "\n";
-        for my $filename (keys %missing_questions) {
+        
+        for my $filename (sort keys %missing_questions) {
             print "$filename:\n";
             for my $question (@{ $missing_questions{$filename} }) {
                 print "     Missing question: $question";
+            }
+        }
+
+        print '#' x 80 . "\n";
+        for my $filename (sort keys %missing_answers) {
+            print "$filename:\n";
+            for my $answer (@{ $missing_answers{$filename} }) {
+                print "     Missing answer: $answer";
             }
         }
     }
@@ -84,9 +106,9 @@ sub read_in_files (@inputs) {
     return @files;
 }
 
-# $ARGV[0] = 'resource/normal-exam/IntroPerlEntryExam.txt'; 
-# $ARGV[1] = 'resource/normal-exam/Wagner_Caro.txt';
-
+# $ARGV[0] = 'resource/short-exam/IntroPerlEntryExamShort.txt'; 
+# $ARGV[1] = 'resource/short-exam/Wengel_Engel.txt';
+# $ARGV[1] = 'resource/short-exam/SmytheJones_StJohn.txt';
 
 my $master_file = $ARGV[0];
 my @students_files = read_in_files(@ARGV[1..scalar(@ARGV)-1]);
