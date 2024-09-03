@@ -5,15 +5,14 @@ use lib './lib';
 
 use Exam_Reader;
 use Regex ':regex';
-
-# use Data::Show;
+use Statistics ':subs';
 
 my $master = undef;
 my @students = ();
 
 sub print_score () {
     if ($master && @students) {
-        (my $assessment, my %missing_questions, my %missing_answers);
+        (my $assessment, my %missing_questions, my %missing_answers, my %result);
          my $question_num = $master->get_question_total();
 
         for my $student (@students) {
@@ -55,28 +54,76 @@ sub print_score () {
             my $filename = $student->get_filename();
             my $final_score = $student_score . "/" . $student_questions;
             my $output = $filename . ('.' x (80-length($filename)-length($final_score))) . $final_score;
+            
             $assessment .= "$output\n";
+            $result{$filename} = [$student_score, $student_questions];
         }
-        print $assessment;
-        print '#' x 80 . "\n";
-        
-        for my $filename (sort keys %missing_questions) {
-            print "$filename:\n";
-            for my $question (@{ $missing_questions{$filename} }) {
-                print "     Missing question: $question";
-            }
-        }
-
-        print '#' x 80 . "\n";
-        for my $filename (sort keys %missing_answers) {
-            print "$filename:\n";
-            for my $answer (@{ $missing_answers{$filename} }) {
-                print "     Missing answer: $answer";
-            }
-        }
+        print_assessment ($assessment);
+        print_missing_questions (%missing_questions);
+        print_missing_answers (%missing_answers);
+        print_statistics (%result);
     }
     else {
         die ("Exams are not loaded");
+    }
+}
+
+sub print_assessment ($assessment) {
+    print $assessment;
+    print '#' x 80 . "\n";
+}
+
+sub print_missing_questions (%missing_questions) {
+    for my $filename (sort keys %missing_questions) {
+        print "$filename:\n";
+        for my $question (@{ $missing_questions{$filename} }) {
+            print "     Missing question: $question";
+        }
+    }
+    print '#' x 80 . "\n";
+}
+
+sub print_missing_answers (%missing_answers) {
+    for my $filename (sort keys %missing_answers) {
+        print "$filename:\n";
+        for my $answer (@{ $missing_answers{$filename} }) {
+            print "     Missing answer: $answer";
+        }
+    }
+    print '#' x 80 . "\n";
+}
+
+sub print_statistics (%students) {
+    Statistics::add_students (%students);
+    
+    my $avg_question = Statistics::avg_question();
+    my @min_question_stats = Statistics::min_question();
+    my @max_question_stats = Statistics::max_question();
+
+    my $avg_answer = Statistics::avg_answer();
+    my @min_answer_stats = Statistics::min_answer();
+    my @max_answer_stats = Statistics::max_answer();
+    
+    if (scalar(@min_question_stats) == 2 && scalar(@max_question_stats) == 2) {
+        my $min_question = $min_question_stats[0];
+        my $min_question_amount = $min_question_stats[1];
+        my $max_question = $max_question_stats[0];
+        my $max_question_amount = $max_question_stats[1];
+
+        print "Average number of questions answered:" . ('.' x (80-length("Average number of questions answered:")-length($avg_question))) . "$avg_question\n";
+        print "     Minimum:" . ('.' x (80-length("     Minimum:")-length($min_question))) . "$min_question  (So many: $min_question_amount)\n";
+        print "     Maximum:" . ('.' x (80-length("     Maximum:")-length($max_question))) . "$max_question  (So many: $max_question_amount)\n";
+    }
+    
+    if (scalar(@min_answer_stats) == 2 && scalar(@max_answer_stats) == 2) {
+        my $min_answer = $min_answer_stats[0];
+        my $min_answer_amount = $min_answer_stats[1];
+        my $max_answer = $max_answer_stats[0];
+        my $max_answer_amount = $max_answer_stats[1];
+        
+        print "Average number of correct answers:" . ('.' x (80-length("Average number of correct answers:")-length($avg_answer))) . "$avg_answer\n";
+        print "     Minimum:" . ('.' x (80-length("     Minimum:")-length($min_answer))) . "$min_answer  (So many: $min_answer_amount)\n";
+        print "     Maximum:" . ('.' x (80-length("     Maximum:")-length($max_answer))) . "$max_answer  (So many: $max_answer_amount)\n";
     }
 }
 
@@ -107,8 +154,7 @@ sub read_in_files (@inputs) {
 }
 
 # $ARGV[0] = 'resource/short-exam/IntroPerlEntryExamShort.txt'; 
-# $ARGV[1] = 'resource/short-exam/Wengel_Engel.txt';
-# $ARGV[1] = 'resource/short-exam/SmytheJones_StJohn.txt';
+# $ARGV[1] = 'resource/short-exam/*';
 
 my $master_file = $ARGV[0];
 my @students_files = read_in_files(@ARGV[1..scalar(@ARGV)-1]);
