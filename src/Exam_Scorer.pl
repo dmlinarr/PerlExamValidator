@@ -104,6 +104,9 @@ sub print_statistics (%students) {
     my @min_answer_stats = Statistics::min_answer();
     my @max_answer_stats = Statistics::max_answer();
     
+    my %less_half_total_question = Statistics::less_than_half_the_total_question($master->get_question_total());
+    my %less_half_answers_correct = Statistics::less_than_half_the_answers_correct();
+    
     if (scalar(@min_question_stats) == 2 && scalar(@max_question_stats) == 2) {
         my $min_question = $min_question_stats[0];
         my $min_question_amount = $min_question_stats[1];
@@ -124,6 +127,34 @@ sub print_statistics (%students) {
         print "Average number of correct answers:" . ('.' x (80-length("Average number of correct answers:")-length($avg_answer))) . "$avg_answer\n";
         print "     Minimum:" . ('.' x (80-length("     Minimum:")-length($min_answer))) . "$min_answer  (So many: $min_answer_amount)\n";
         print "     Maximum:" . ('.' x (80-length("     Maximum:")-length($max_answer))) . "$max_answer  (So many: $max_answer_amount)\n";
+    }
+
+    my $header;
+
+    if (%less_half_total_question) {
+        $header = "Results below expectation:\n";
+        print $header;
+        
+        for my $less_half_tot (keys %less_half_total_question) {
+            my $score = $less_half_total_question{$less_half_tot}[0];
+            my $tot_question = $less_half_total_question{$less_half_tot}[1];
+            my $final_score = $score . "/" . $tot_question;
+            print "     $less_half_tot" . ('.' x (80-length("     $less_half_tot")-length($final_score))) . "$final_score  (Question answered < 50%)\n";
+        }
+    }
+
+    if (%less_half_answers_correct) {
+        if(not defined($header)) {
+            $header = "Results below expectation:\n";
+            print $header;
+        }
+
+        for my $less_half_answer (keys %less_half_answers_correct) {
+            my $score = $less_half_answers_correct{$less_half_answer }[0];
+            my $tot_question = $less_half_answers_correct{$less_half_answer }[1];
+            my $final_score = $score . "/" . $tot_question;
+            print "     $less_half_answer" . ('.' x (80-length("     $less_half_answer")-length($final_score))) . "$final_score  (Answers correct < 50%)\n";
+        }
     }
 }
 
@@ -153,8 +184,8 @@ sub read_in_files (@inputs) {
     return @files;
 }
 
-# $ARGV[0] = 'resource/short-exam/IntroPerlEntryExamShort.txt'; 
-# $ARGV[1] = 'resource/short-exam/*';
+# $ARGV[0] = 'resource/normal-exam/IntroPerlEntryExam.txt'; 
+# $ARGV[1] = 'resource/normal-exam/*';
 
 my $master_file = $ARGV[0];
 my @students_files = read_in_files(@ARGV[1..scalar(@ARGV)-1]);

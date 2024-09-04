@@ -14,6 +14,8 @@ our %EXPORT_TAGS = (
         min_answer
         max_answer
         avg_answer
+        less_than_half_the_total_question
+        less_than_half_the_answers_correct
     ), 
 );
 
@@ -146,6 +148,42 @@ sub avg_answer () {
         }
         return $sum/$count;
     }
+    else {
+        return undef;
+    }
+}
+
+sub less_than_half_the_total_question ($max_amount) {
+    my %filter;
+
+    if (%data) {
+        for my $student (keys %data) {
+            if (defined $data{$student}[0] && defined $data{$student}[1]) {
+                if ($data{$student}[1] < $max_amount / 2) {
+                    $filter{$student} = [$data{$student}[0], $data{$student}[1]];
+                }
+            }
+        }
+        return %filter;
+    } 
+    else {
+        return undef;
+    }
+}
+
+sub less_than_half_the_answers_correct () {
+    my %filter;
+
+    if (%data) {
+        for my $student (keys %data) {
+            if (defined $data{$student}[0] && defined $data{$student}[1]) {
+                if ($data{$student}[0] < $data{$student}[1] / 2) {
+                    $filter{$student} = [$data{$student}[0], $data{$student}[1]];
+                }
+            }
+        }
+        return %filter;
+    } 
     else {
         return undef;
     }
