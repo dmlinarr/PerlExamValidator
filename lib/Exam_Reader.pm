@@ -3,6 +3,8 @@ package Exam_Reader;
 use v5.36;
 use warnings;
 use strict;
+use Lingua::StopWords 'getStopWords';
+use Text::Levenshtein 'distance';
 use Exporter 'import';
 use lib './lib';
 
@@ -126,6 +128,24 @@ sub question_through_num ($self, $num) {
     }
 }
 
+sub question_through_toleranz ($self, $original_norm_question) {
+    foreach my $norm_exact_question (@{$self->{questions}}) {
+        if ($norm_exact_question eq $original_norm_question) {
+            return $norm_exact_question; 
+        }
+    }
+
+    foreach my $norm_maybe_question (@{$self->{questions}}) {
+        my $edit_distance = distance($original_norm_question, $norm_maybe_question);
+        my $max_toleranz = 0.10 * length($original_norm_question);
+        if ($edit_distance <= $max_toleranz) {
+            return $norm_maybe_question;
+        };
+    }
+
+    return undef;
+}
+
 sub pretty_question_through_norm ($self, $norm_question) {
     if (exists $self->{pretty_question}{$norm_question}) {
         return $self->{pretty_question}{$norm_question};
@@ -156,7 +176,7 @@ sub all_answers_through_norm_question ($self, $norm_question) {
 }
 
 sub marked_answers_through_norm_question ($self, $norm_question) {
-    if (exists $self->{marked_norm_answers}{$norm_question}) {
+    if (defined $norm_question && exists $self->{marked_norm_answers}{$norm_question}) {
         return @{$self->{marked_norm_answers}{$norm_question}}
     }
     else {
@@ -190,7 +210,7 @@ sub normalized_question ($printed_question) {
     $printed_question =~ s{$Regex::LINE_BREAK_DETECT}{}g; # remove line breaks
     $printed_question =~ s{$Regex::WHITESPACE_MULTIPLE_DETECT}{ }g; # remove multiple spaces between words
     $printed_question = lc($printed_question); # all words to lower case
-    # $printed_question = stop words 
+    $printed_question = clear_stop_words  ($printed_question); # filter non stop words 
     return $printed_question;
 }
 
@@ -208,7 +228,7 @@ sub normalized_answer ($printed_answer) {
     $printed_answer =~ s{$Regex::LINE_BREAK_DETECT}{}g; # remove line breaks
     $printed_answer =~ s{$Regex::WHITESPACE_MULTIPLE_DETECT}{ }g; # remove multiple spaces between words
     $printed_answer = lc($printed_answer); # all words to lower case
-    # $printed_question = stop words 
+    $printed_answer = clear_stop_words  ($printed_answer); # filter non stop words 
     return $printed_answer;
 }
 
@@ -249,6 +269,14 @@ sub is_marked_answer ($line) {
     return $line =~ $Regex::ANSWER_MARK_DETECT;
 }
 
+sub clear_stop_words  ($line) {
+    my $stopwords = getStopWords('en');
+    my @words = split ' ', $line;
+    my @filtered_words = grep { !$stopwords->{$_} } @words;
+    my $no_stop_words_string = join ' ', @filtered_words;
+    return $no_stop_words_string; 
+}
+
 ##### PUBLIC HELPER #####
 
 sub get_layout ($self, $num) {
@@ -258,15 +286,6 @@ sub get_layout ($self, $num) {
     else {
         return undef;
     }
-}
-
-sub has_question ($self, $norm_question) {
-    foreach my $question (@{$self->{questions}}) {
-        if ($question eq $norm_question) {
-            return 1; 
-        }
-    }
-    return 0;
 }
 
 sub get_filename ($self) {

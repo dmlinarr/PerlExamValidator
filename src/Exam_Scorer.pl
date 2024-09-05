@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use v5.36;
+use Text::Levenshtein 'distance';
 use lib './lib';
 
 use Exam_Reader;
@@ -9,10 +10,10 @@ use Statistics ':subs';
 
 my $master = undef;
 my @students = ();
+(my $assessment, my %missing_questions, my %instead_questions, my %missing_answers, my %instead_answers, my %result);
 
 sub print_score () {
     if ($master && @students) {
-        (my $assessment, my %missing_questions, my %missing_answers, my %result);
         my $question_num = $master->question_amount();
 
         for my $student (@students) {
@@ -20,35 +21,75 @@ sub print_score () {
             my $student_score = 0;
 
             for my $num (1 .. $question_num) {
-                my $norm_question = $master->question_through_num ($num);
+                # hole frage von master, hole exacte oder ähnliche frage von student 
+                my $norm_question_master = $master->question_through_num ($num);
+                my $norm_question_student = $student->question_through_toleranz ($norm_question_master);
                 
-                my @student_answers_marked = $student->marked_answers_through_norm_question($norm_question);
-                my @master_answers_marked = $master->marked_answers_through_norm_question($norm_question);
+                # hole gewählte antwort von master und student
+                my @master_answers_marked = $master->marked_answers_through_norm_question($norm_question_master);
+                my @student_answers_marked = $student->marked_answers_through_norm_question($norm_question_student);
                 
-                if (scalar(@student_answers_marked) == 1) {
-                    $student_questions++;
-                    if ($master_answers_marked[0] eq $student_answers_marked[0]) {
-                        $student_score++;
+                # überprüfe ob gemeinsame frage angenommen: 1. gleich:gleich (nichts, akzeptieren), gleich:ähnlich (loggen, akzeptieren), gleich:verschieden (loggen, nicht akzeptieren)
+                if (defined $norm_question_student) {
+                    if ($norm_question_master eq $norm_question_student) {
+                        $student_questions++;
                     }
-                }
-                
-                
-                if ($student->has_question($norm_question)) {
-                    my @student_answers_norm = $student->all_answers_through_norm_question($norm_question);
-                    my @master_answers_norm = $master->all_answers_through_norm_question($norm_question);
+                    else {
+                        $student_questions++;
+                        my $missing_q = $master->pretty_question_through_norm($norm_question_master);
+                        my $instead_q = $student->pretty_question_through_norm($norm_question_student);
+                        my $filename = $student->get_filename(); 
+                        my $filename_and_question = $filename . $missing_q;       
+                        
+                        push (@{$missing_questions{$filename}}, $missing_q);
+                        $instead_questions{$filename_and_question} = $instead_q;
+                    }
+                    
+                    # falls akzeptiert: # überprüfe ob gemeinsame antwort angenommen: 1. gleich:gleich (nichts, akzeptieren), gleich:ähnlich (loggen, akzeptieren), gleich:verschieden (loggen, nicht akzeptieren)
+                    if (scalar(@student_answers_marked) == 1) {
+                        if ($master_answers_marked[0] eq $student_answers_marked[0]) {
+                            $student_score++;
+                        }
+                        elsif (correct_according_distance ($master_answers_marked[0], $student_answers_marked[0])) {
+                            $student_score++;
+                            my $missing_a = $master->pretty_answer_through_norm($master_answers_marked[0]);
+                            my $instead_a = $student->pretty_answer_through_norm($student_answers_marked[0]);
+                            my $filename = $student->get_filename();        
+                            my $filename_and_answer = $filename . $missing_a;
+                            
+                            push (@{$missing_answers{$filename}}, $missing_a);
+                            $instead_answers{$filename_and_answer} = $instead_a;
+                        }
+                        else {
+                            # die eine antwort ist falsch
+                        }
+                    }
+                    else {
+                        # mehrere oder keine antwort 
+                    }
+
+                    # Überprüfe jetzt noch ob alle antworten beim studenten vorhanden sind
+                    my @master_answers_norm = $master->all_answers_through_norm_question($norm_question_master);
+                    my @student_answers_norm = $student->all_answers_through_norm_question($norm_question_student);
                     
                     for my $norm_answer (@master_answers_norm) {
                         unless (grep { $_ eq $norm_answer } @student_answers_norm) {
                             my $filename = $student->get_filename();
-                            my $answer_pretty = $master->pretty_answer_through_norm($norm_answer);            
-                            push (@{$missing_answers{$filename}}, $answer_pretty);
+                            my $missing_a = $master->pretty_answer_through_norm($norm_answer);
+                            my $filename_and_answer = $filename . $missing_a;
+
+                            # Überprüfe, ob der Wert $missing_a noch nicht im Array @{$missing_answers{$filename}} ist
+                            if (not exists $instead_answers{$filename_and_answer}) {
+                                push (@{$missing_answers{$filename}}, $missing_a);
+                            }
                         }
                     }
+
                 }
                 else {
                     my $filename = $student->get_filename();        
-                    my $question = $master->pretty_question_through_norm($norm_question);
-                    push (@{$missing_questions{$filename}}, $question);
+                    my $missing_q = $master->pretty_question_through_norm($norm_question_master);
+                    push (@{$missing_questions{$filename}}, $missing_q);
                 }
             }
 
@@ -60,8 +101,8 @@ sub print_score () {
             $result{$filename} = [$student_score, $student_questions];
         }
         print_assessment ($assessment);
-        print_missing_questions (%missing_questions);
-        print_missing_answers (%missing_answers);
+        print_missing_questions ();
+        print_missing_answers ();
         print_statistics (%result);
     }
     else {
@@ -74,21 +115,35 @@ sub print_assessment ($assessment) {
     print '#' x 80 . "\n";
 }
 
-sub print_missing_questions (%missing_questions) {
+sub print_missing_questions () {
     for my $filename (sort keys %missing_questions) {
         print "$filename:\n";
+        
         for my $question (@{ $missing_questions{$filename} }) {
             print "     Missing question: $question\n";
+            my $filename_and_question = $filename . $question;
+            
+            if (exists $instead_questions{$filename_and_question}) {
+                my $instead_q = $instead_questions{$filename_and_question};
+                print "     Used this instead: $instead_q\n";
+            }
         }
     }
     print '#' x 80 . "\n";
 }
 
-sub print_missing_answers (%missing_answers) {
+sub print_missing_answers () {
     for my $filename (sort keys %missing_answers) {
         print "$filename:\n";
+
         for my $answer (@{ $missing_answers{$filename} }) {
             print "     Missing answer: $answer\n";
+            my $filename_and_answer = $filename . $answer;
+            
+            if (exists $instead_answers{$filename_and_answer}) {
+                my $instead_a = $instead_answers{$filename_and_answer};
+                print "     Used this instead: $instead_a\n";
+            }
         }
     }
     print '#' x 80 . "\n";
@@ -159,6 +214,12 @@ sub print_statistics (%students) {
     }
 }
 
+sub correct_according_distance ($master_string, $student_string) {
+    my $edit_distance = distance($master_string, $student_string);
+    my $max_toleranz = 0.10 * length($master_string);
+    return $edit_distance <= $max_toleranz;
+}
+
 sub read_in_exams ($master_file,@students_files) {
     $master = Exam_Reader->new($master_file);
     
@@ -186,7 +247,7 @@ sub read_in_files (@inputs) {
 }
 
 # $ARGV[0] = 'resource/short-exam/IntroPerlEntryExamShort.txt'; 
-# $ARGV[1] = 'resource/short-exam/SmytheJones_StJohn.txt';
+# $ARGV[1] = 'resource/short-exam/Wengel_Engel.txt';
 
 my $master_file = $ARGV[0];
 my @students_files = read_in_files(@ARGV[1..scalar(@ARGV)-1]);
