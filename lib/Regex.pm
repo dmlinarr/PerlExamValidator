@@ -7,38 +7,39 @@ use Exporter 'import';
 
 our %EXPORT_TAGS = (
     regex => qw ( 
-        $QUESTION_START_DETECT_REGEX
-        $QUESTION_END_DETECT_REGEX 
-        $QUESTION_PATTERN_REGEX
-        $QUESTION_PRESS_REGEX 
+        $STARTLINE_EXERCISE_DETECT
+        $ENDLINE_EXAM_DETECT
 
-        $ANSWER_START_DETECT_REGEX 
-        $ANSWER_END_DETECT_REGEX 
-        $ANSWER_PATTERN_REGEX 
-        $ANSWER_PRESS_REGEX
+        $WHITESPACE_START_END_DETECT
+        $WHITESPACE_MULTIPLE_DETECT
+        $WHITESPACE_SINGLE_DETECT
 
-        $STARTLINE_DETECT_REGEX
-        $ENDLINE_DETECT_REGEX 
+        $QUESTION_NUM_DETECT
+        $QUESTION_PATTERN_REPLACE
+        $ANSWER_BRACKET_DETECT
+        $ANSWER_MARK_DETECT
+        $ANSWER_PATTERN_REPLACE
         
+        $LINE_BREAK_DETECT
         $FILENAME_PATTERN_REGEX
         $LAYOUTSPLIT_PATTERN_REGEX
-        ...
     ),
 );
 
-our $QUESTION_START_DETECT_REGEX = qr{^\s*\d+\.};
-our $QUESTION_END_DETECT_REGEX = qr{^\s*$};
-our $QUESTION_PATTERN_REGEX = qr{^\d+};
-our $QUESTION_PRESS_REGEX = qr{\s*\d+\.\s*|\s+};
+our $STARTLINE_EXERCISE_DETECT = qr{^_{2,}$};
+our $ENDLINE_EXAM_DETECT = qr{^={2,}$};
 
-our $ANSWER_START_DETECT_REGEX = qr{\[\s*.\s*\]|\[\s*\]};
-our $ANSWER_END_DETECT_REGEX = qr{^\s*$};
-our $ANSWER_PATTERN_REGEX = qr{\[\s*\S\s*\](.*)};
-our $ANSWER_PRESS_REGEX = qr{\s*\[\s*\S?\s*\]\s*|\s+};
+our $WHITESPACE_START_END_DETECT = qr{^\s+|\s+$};
+our $WHITESPACE_MULTIPLE_DETECT = qr{\s{2,}};
+our $WHITESPACE_SINGLE_DETECT = qr{^\s*$};
 
-our $STARTLINE_DETECT_REGEX = qr{^_{2,}$};
-our $ENDLINE_DETECT_REGEX = qr{^={2,}$};
+our $QUESTION_NUM_DETECT = qr{^\d+\.\s*};
+our $QUESTION_PATTERN_REPLACE = qr{^\d+};
+our $ANSWER_BRACKET_DETECT = qr{^\[\s*.*?\]\s*};
+our $ANSWER_MARK_DETECT = qr{^\s*\[\s*\S+\s*\]};
+our $ANSWER_PATTERN_REPLACE = qr{\[\s*\S\s*\](.*)};
 
+our $LINE_BREAK_DETECT = qr{\R};
 our $FILENAME_PATTERN_REGEX = qr{([^/]+)$};
 our $LAYOUTSPLIT_PATTERN_REGEX = qr{^(.*?)(?:Q)(.*?)(?:A)(.*)$}s;
 

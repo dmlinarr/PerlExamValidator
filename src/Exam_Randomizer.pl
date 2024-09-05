@@ -10,7 +10,7 @@ use Exam_Writer ':subs';
 use Regex ':regex';
 
 sub create_random_exam ($reader){
-    my $question_num = $reader->get_question_total();
+    my $question_num = $reader->question_amount();
     my @num_bucket = shuffle(1 .. $question_num);
     my $count = 1;
 
@@ -18,11 +18,14 @@ sub create_random_exam ($reader){
     Exam_Writer::write_intro_or_outro($intro);
     
     while (my $num = shift (@num_bucket)) {  
+        my $norm_question = $reader->question_through_num($num);
+        my @random_norm_answers = shuffle($reader->all_answers_through_norm_question($norm_question));
+
         my $layout = $reader->get_layout($num);
-        my $question = $reader->get_question_pretty($num);
-        my @random_answers = shuffle($reader->get_answers_pretty($num));
+        my $question = $reader->printed_question_through_norm($norm_question);
+        $question =~ s{$Regex::QUESTION_PATTERN_REPLACE}{$count++}e;
+        my @random_answers = map { $reader->printed_answer_through_norm($_) } @random_norm_answers;
         
-        $question =~ s{$Regex::QUESTION_PATTERN_REGEX}{$count++}e;
         Exam_Writer::write_one_question($layout, $question, @random_answers);
     }
 

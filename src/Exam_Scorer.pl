@@ -13,17 +13,17 @@ my @students = ();
 sub print_score () {
     if ($master && @students) {
         (my $assessment, my %missing_questions, my %missing_answers, my %result);
-         my $question_num = $master->get_question_total();
+        my $question_num = $master->question_amount();
 
         for my $student (@students) {
             my $student_questions = 0;
             my $student_score = 0;
 
             for my $num (1 .. $question_num) {
-                my $question_pressed = $master->get_question_pressed($num);
+                my $norm_question = $master->question_through_num ($num);
                 
-                my @student_answers_marked = $student->get_marked_answer_pressed($question_pressed);
-                my @master_answers_marked = $master->get_marked_answer_pressed($question_pressed);
+                my @student_answers_marked = $student->marked_answers_through_norm_question($norm_question);
+                my @master_answers_marked = $master->marked_answers_through_norm_question($norm_question);
                 
                 if (scalar(@student_answers_marked) == 1) {
                     $student_questions++;
@@ -33,20 +33,21 @@ sub print_score () {
                 }
                 
                 
-                if (my @student_answers_pressed = $student->has_question($question_pressed)) {
-                    my @master_answers_pressed = $master->get_answers_pressed($num);
+                if ($student->has_question($norm_question)) {
+                    my @student_answers_norm = $student->all_answers_through_norm_question($norm_question);
+                    my @master_answers_norm = $master->all_answers_through_norm_question($norm_question);
                     
-                    for my $answer (@master_answers_pressed) {
-                        unless (grep { $_ eq $answer } @student_answers_pressed) {
+                    for my $norm_answer (@master_answers_norm) {
+                        unless (grep { $_ eq $norm_answer } @student_answers_norm) {
                             my $filename = $student->get_filename();
-                            my $answer_pretty = $master->reverse_answer_to_pretty($answer);            
+                            my $answer_pretty = $master->pretty_answer_through_norm($norm_answer);            
                             push (@{$missing_answers{$filename}}, $answer_pretty);
                         }
                     }
                 }
                 else {
                     my $filename = $student->get_filename();        
-                    my $question = $master->get_question_pretty($num);
+                    my $question = $master->pretty_question_through_norm($norm_question);
                     push (@{$missing_questions{$filename}}, $question);
                 }
             }
@@ -77,7 +78,7 @@ sub print_missing_questions (%missing_questions) {
     for my $filename (sort keys %missing_questions) {
         print "$filename:\n";
         for my $question (@{ $missing_questions{$filename} }) {
-            print "     Missing question: $question";
+            print "     Missing question: $question\n";
         }
     }
     print '#' x 80 . "\n";
@@ -87,7 +88,7 @@ sub print_missing_answers (%missing_answers) {
     for my $filename (sort keys %missing_answers) {
         print "$filename:\n";
         for my $answer (@{ $missing_answers{$filename} }) {
-            print "     Missing answer: $answer";
+            print "     Missing answer: $answer\n";
         }
     }
     print '#' x 80 . "\n";
@@ -104,7 +105,7 @@ sub print_statistics (%students) {
     my @min_answer_stats = Statistics::min_answer();
     my @max_answer_stats = Statistics::max_answer();
     
-    my %less_half_total_question = Statistics::less_than_half_the_total_question($master->get_question_total());
+    my %less_half_total_question = Statistics::less_than_half_the_total_question($master->question_amount());
     my %less_half_answers_correct = Statistics::less_than_half_the_answers_correct();
     
     if (scalar(@min_question_stats) == 2 && scalar(@max_question_stats) == 2) {
@@ -184,8 +185,8 @@ sub read_in_files (@inputs) {
     return @files;
 }
 
-# $ARGV[0] = 'resource/normal-exam/IntroPerlEntryExam.txt'; 
-# $ARGV[1] = 'resource/normal-exam/*';
+# $ARGV[0] = 'resource/short-exam/IntroPerlEntryExamShort.txt'; 
+# $ARGV[1] = 'resource/short-exam/SmytheJones_StJohn.txt';
 
 my $master_file = $ARGV[0];
 my @students_files = read_in_files(@ARGV[1..scalar(@ARGV)-1]);
