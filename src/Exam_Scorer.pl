@@ -5,12 +5,15 @@ use Text::Levenshtein 'distance';
 use lib './lib';
 
 use Exam_Reader;
+use Cheating;
 use Regex ':regex';
 use Statistics ':subs';
 
+use Data::Show;
+
 my $master = undef;
 my @students = ();
-(my $assessment, my %missing_questions, my %instead_questions, my %missing_answers, my %instead_answers, my %result);
+(my $assessment, my %missing_questions, my %instead_questions, my %missing_answers, my %instead_answers, my %result, my %wrong_answers);
 
 sub print_score () {
     if ($master && @students) {
@@ -61,11 +64,31 @@ sub print_score () {
                             $instead_answers{$filename_and_answer} = $instead_a;
                         }
                         else {
-                            # die eine antwort ist falsch
+                            # die eine antwort war falsch
+                            my $filename = $student->get_filename();
+                            
+                            if (not exists $wrong_answers{$filename}) {
+                                $wrong_answers{$filename} = Cheating->new($filename);
+                            }
+
+                            $wrong_answers{$filename}->add_wrong_answer ($norm_question_master, $student_answers_marked[0]);                            
                         }
                     }
                     else {
-                        # mehrere oder keine antwort 
+                        # Entweder keine antwort oder mehrere antworten gewaehlt
+                        my $filename = $student->get_filename();
+                        if (not exists $wrong_answers{$filename}) {
+                            $wrong_answers{$filename} = Cheating->new($filename);
+                        }
+
+                        if (not @student_answers_marked) {
+                            $wrong_answers{$filename}->add_wrong_answer ($norm_question_master, undef);
+                        }
+                        else {
+                            for my $wrong_answer (@student_answers_marked) {
+                                $wrong_answers{$filename}->add_wrong_answer ($norm_question_master, $wrong_answer);
+                            }
+                        } 
                     }
 
                     # Überprüfe jetzt noch ob alle antworten beim studenten vorhanden sind
@@ -100,17 +123,18 @@ sub print_score () {
             $assessment .= "$output\n";
             $result{$filename} = [$student_score, $student_questions];
         }
-        print_assessment ($assessment);
+        print_assessment ();
         print_missing_questions ();
         print_missing_answers ();
-        print_statistics (%result);
+        print_statistics ();
+        print_cheating ()
     }
     else {
         die ("Exams are not loaded");
     }
 }
 
-sub print_assessment ($assessment) {
+sub print_assessment () {
     print $assessment;
     print '#' x 80 . "\n";
 }
@@ -149,8 +173,8 @@ sub print_missing_answers () {
     print '#' x 80 . "\n";
 }
 
-sub print_statistics (%students) {
-    Statistics::add_students (%students);
+sub print_statistics () {
+    Statistics::add_students (%result);
     
     my $avg_question = Statistics::avg_question();
     my @min_question_stats = Statistics::min_question();
@@ -212,6 +236,13 @@ sub print_statistics (%students) {
             print "     $less_half_answer" . ('.' x (80-length("     $less_half_answer")-length($final_score))) . "$final_score  (Answers correct < 50%)\n";
         }
     }
+    print '#' x 80 . "\n";
+}
+
+sub print_cheating () {
+    print "TODO: print_cheating gibt Verdachtsfaelle auf Konsole aus\n";
+    show %wrong_answers;
+    # Implementiere Cheating::check_if_I_am_cheater  
 }
 
 sub correct_according_distance ($master_string, $student_string) {
@@ -247,7 +278,7 @@ sub read_in_files (@inputs) {
 }
 
 # $ARGV[0] = 'resource/short-exam/IntroPerlEntryExamShort.txt'; 
-# $ARGV[1] = 'resource/short-exam/Wengel_Engel.txt';
+# $ARGV[1] = 'resource/short-exam/Marz_Jupiter.txt';
 
 my $master_file = $ARGV[0];
 my @students_files = read_in_files(@ARGV[1..scalar(@ARGV)-1]);
