@@ -13,11 +13,12 @@ use Data::Show;
 
 my $master = undef;
 my @students = ();
-(my $assessment, my %missing_questions, my %instead_questions, my %missing_answers, my %instead_answers, my %result, my %wrong_answers);
+(my $assessment, my %missing_questions, my %instead_questions, my %missing_answers, my %instead_answers, my %result, my %cheaters);
 
 sub print_score () {
     if ($master && @students) {
         my $question_num = $master->question_amount();
+        my $answer_num = $master->answer_amount();
 
         for my $student (@students) {
             my $student_questions = 0;
@@ -67,26 +68,26 @@ sub print_score () {
                             # die eine antwort war falsch
                             my $filename = $student->get_filename();
                             
-                            if (not exists $wrong_answers{$filename}) {
-                                $wrong_answers{$filename} = Cheating->new($filename);
+                            if (not exists $cheaters{$filename}) {
+                                $cheaters{$filename} = Cheating->new($filename);
                             }
 
-                            $wrong_answers{$filename}->add_wrong_answer ($norm_question_master, $student_answers_marked[0]);                            
+                            $cheaters{$filename}->add_wrong_answer ($norm_question_master, $student_answers_marked[0]);                            
                         }
                     }
                     else {
                         # Entweder keine antwort oder mehrere antworten gewaehlt
                         my $filename = $student->get_filename();
-                        if (not exists $wrong_answers{$filename}) {
-                            $wrong_answers{$filename} = Cheating->new($filename);
+                        if (not exists $cheaters{$filename}) {
+                            $cheaters{$filename} = Cheating->new($filename);
                         }
 
                         if (not @student_answers_marked) {
-                            $wrong_answers{$filename}->add_wrong_answer ($norm_question_master, undef);
+                            $cheaters{$filename}->add_wrong_answer ($norm_question_master, undef);
                         }
                         else {
                             for my $wrong_answer (@student_answers_marked) {
-                                $wrong_answers{$filename}->add_wrong_answer ($norm_question_master, $wrong_answer);
+                                $cheaters{$filename}->add_wrong_answer ($norm_question_master, $wrong_answer);
                             }
                         } 
                     }
@@ -127,7 +128,7 @@ sub print_score () {
         print_missing_questions ();
         print_missing_answers ();
         print_statistics ();
-        print_cheating ()
+        print_cheating ($question_num,$answer_num);
     }
     else {
         die ("Exams are not loaded");
@@ -239,10 +240,13 @@ sub print_statistics () {
     print '#' x 80 . "\n";
 }
 
-sub print_cheating () {
-    print "TODO: print_cheating gibt Verdachtsfaelle auf Konsole aus\n";
-    show %wrong_answers;
-    # Implementiere Cheating::check_if_I_am_cheater  
+sub print_cheating ($question_amount, $answer_amount) {
+    print "TODO: Quest: $question_amount Answer: $answer_amount\n";
+    show %cheaters;
+
+    # for my $cheater (keys %wrong_answers) {
+    #    $cheater->check_if_I_am_cheater ($question_amount, $answer_amount, %cheaters)
+    # }
 }
 
 sub correct_according_distance ($master_string, $student_string) {

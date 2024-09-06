@@ -166,6 +166,16 @@ sub printed_question_through_norm ($self, $norm_question) {
 
 ##### ANSWER #####
 
+sub answer_amount ($self) {
+    my $first_answer = $self->{questions}[0];
+    if (defined $first_answer) {
+        return scalar(all_answers_through_norm_question ($self, $first_answer));
+    } 
+    else {
+        return undef; 
+    } 
+}
+
 sub all_answers_through_norm_question ($self, $norm_question) {
     if (exists $self->{all_norm_answers}{$norm_question}) {
         return @{$self->{all_norm_answers}{$norm_question}}
