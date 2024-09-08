@@ -1,0 +1,63 @@
+resource/short-exam/Bar_Gru.txt..............................................0/3
+resource/short-exam/IntroPerlEntryExamShort.txt..............................3/3
+resource/short-exam/Marz_Jupiter.txt.........................................0/3
+resource/short-exam/response4.txt............................................0/3
+resource/short-exam/response6.txt............................................3/3
+resource/short-exam/SmytheJones_StJohn.txt...................................0/1
+resource/short-exam/Tak_Tak.txt..............................................3/3
+resource/short-exam/Wengel_Engel.txt.........................................1/3
+
+################################################################################
+
+resource/short-exam/SmytheJones_StJohn.txt:
+     Missing question: The lecturer for this class is:
+     Missing question: The correct way to answer each question is:
+
+
+################################################################################
+
+resource/short-exam/Wengel_Engel.txt:
+     Missing answer: Dr Theodor Seuss Geisel
+     Missing answer: Dr Damian Conway
+     Missing answer: To put an X in the box beside the correct answer
+     Used this instead: put an X in the box besides the correct answer
+
+
+################################################################################
+
+Average number of questions answered:.......................................2.75
+     Minimum:..................................................................1  (So many: 1)
+     Maximum:..................................................................3  (So many: 7)
+
+Average number of correct answers:..........................................1.25
+     Minimum:..................................................................0  (So many: 4)
+     Maximum:..................................................................3  (So many: 3)
+
+Results below expectation:
+     resource/short-exam/SmytheJones_StJohn.txt..............................0/1  (Question answered < 50%)
+     resource/short-exam/response4.txt.......................................0/3  (Answers correct < 50%)
+     resource/short-exam/SmytheJones_StJohn.txt..............................0/1  (Answers correct < 50%)
+     resource/short-exam/Bar_Gru.txt.........................................0/3  (Answers correct < 50%)
+     resource/short-exam/Marz_Jupiter.txt....................................0/3  (Answers correct < 50%)
+     resource/short-exam/Wengel_Engel.txt....................................1/3  (Answers correct < 50%)
+
+################################################################################
+
+     resource/short-exam/Bar_Gru.txt
+and  resource/short-exam/response4.txt.........................probability: 100  (3 out of 3 exactly same false)
+
+     resource/short-exam/Marz_Jupiter.txt
+and  resource/short-exam/Bar_Gru.txt...........................probability: 100  (1 out of 1 exactly same false)
+
+     resource/short-exam/Marz_Jupiter.txt
+and  resource/short-exam/response4.txt.........................probability: 100  (1 out of 1 exactly same false)
+
+     resource/short-exam/SmytheJones_StJohn.txt
+and  resource/short-exam/Bar_Gru.txt...........................probability: 100  (1 out of 1 exactly same false)
+
+     resource/short-exam/SmytheJones_StJohn.txt
+and  resource/short-exam/response4.txt.........................probability: 100  (1 out of 1 exactly same false)
+
+
+################################################################################
+

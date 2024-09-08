@@ -9,8 +9,6 @@ use Cheating;
 use Regex ':regex';
 use Statistics ':subs';
 
-use Data::Show;
-
 my $master = undef;
 my @students = ();
 (my $assessment, my %missing_questions, my %instead_questions, my %missing_answers, my %instead_answers, my %result, my %cheaters);
@@ -18,7 +16,6 @@ my @students = ();
 sub print_score () {
     if ($master && @students) {
         my $question_num = $master->question_amount();
-        my $answer_num = $master->answer_amount();
 
         for my $student (@students) {
             my $student_questions = 0;
@@ -77,20 +74,6 @@ sub print_score () {
                     }
                     else {
                         # Entweder keine antwort oder mehrere antworten gewaehlt
-                        
-                        # my $filename = $student->get_filename();
-                        # if (not exists $cheaters{$filename}) {
-                        #     $cheaters{$filename} = Cheating->new($filename);
-                        # }
-
-                        # if (not @student_answers_marked) {
-                        #    $cheaters{$filename}->add_wrong_answer ($norm_question_master, undef);
-                        # }
-                        # else {
-                        #     for my $wrong_answer (@student_answers_marked) {
-                        #         $cheaters{$filename}->add_wrong_answer ($norm_question_master, $wrong_answer);
-                        #     }
-                        # } 
                     }
 
                     # Überprüfe jetzt noch ob alle antworten beim studenten vorhanden sind
@@ -129,7 +112,7 @@ sub print_score () {
         print_missing_questions ();
         print_missing_answers ();
         print_statistics ();
-        print_cheating ($question_num,$answer_num);
+        print_cheating ($question_num);
     }
     else {
         die ("Exams are not loaded");
@@ -138,7 +121,9 @@ sub print_score () {
 
 sub print_assessment () {
     print $assessment;
+    print "\n";
     print '#' x 80 . "\n";
+    print "\n";
 }
 
 sub print_missing_questions () {
@@ -154,8 +139,11 @@ sub print_missing_questions () {
                 print "     Used this instead: $instead_q\n";
             }
         }
+        print "\n";
     }
+    print "\n";
     print '#' x 80 . "\n";
+    print "\n";
 }
 
 sub print_missing_answers () {
@@ -171,8 +159,11 @@ sub print_missing_answers () {
                 print "     Used this instead: $instead_a\n";
             }
         }
+        print "\n";
     }
+    print "\n";
     print '#' x 80 . "\n";
+    print "\n";
 }
 
 sub print_statistics () {
@@ -198,6 +189,7 @@ sub print_statistics () {
         print "Average number of questions answered:" . ('.' x (80-length("Average number of questions answered:")-length($avg_question))) . "$avg_question\n";
         print "     Minimum:" . ('.' x (80-length("     Minimum:")-length($min_question))) . "$min_question  (So many: $min_question_amount)\n";
         print "     Maximum:" . ('.' x (80-length("     Maximum:")-length($max_question))) . "$max_question  (So many: $max_question_amount)\n";
+        print "\n";
     }
     
     if (scalar(@min_answer_stats) == 2 && scalar(@max_answer_stats) == 2) {
@@ -209,6 +201,7 @@ sub print_statistics () {
         print "Average number of correct answers:" . ('.' x (80-length("Average number of correct answers:")-length($avg_answer))) . "$avg_answer\n";
         print "     Minimum:" . ('.' x (80-length("     Minimum:")-length($min_answer))) . "$min_answer  (So many: $min_answer_amount)\n";
         print "     Maximum:" . ('.' x (80-length("     Maximum:")-length($max_answer))) . "$max_answer  (So many: $max_answer_amount)\n";
+        print "\n";
     }
 
     my $header;
@@ -238,27 +231,33 @@ sub print_statistics () {
             print "     $less_half_answer" . ('.' x (80-length("     $less_half_answer")-length($final_score))) . "$final_score  (Answers correct < 50%)\n";
         }
     }
+    print "\n";
     print '#' x 80 . "\n";
+    print "\n";
 }
 
-sub print_cheating ($question_amount, $answer_amount) {
-    # show %cheaters;
+sub print_cheating ($question_num) {
     my %log_history;
 
     for my $cheater_file (sort keys %cheaters) {
         
         my $cheater = $cheaters{$cheater_file};
-        $cheater->check_if_I_am_cheater ($question_amount, $answer_amount, %cheaters);
+        $cheater->check_if_I_am_cheater ($question_num, %cheaters);
         
         for my $log_name (keys %{$cheater->{log_cheater}}) {
-            unless (exists $log_history{$cheater_file} && $log_history{$cheater_file} ne $log_name) {
+            my $names = $cheater_file . $log_name;
+            my $reverse_names = $log_name . $cheater_file;
+            
+            unless (exists $log_history{$reverse_names}) {
                 print $cheater->{log_cheater}{$log_name};
-                $log_history{$log_name} = $cheater_file;
+                print "\n";
+                $log_history{$names} = 1;
             }
         }
     }
-    print "Need to be checked";
-    show %log_history;
+    print "\n";
+    print '#' x 80 . "\n";
+    print "\n";
 }
 
 sub correct_according_distance ($master_string, $student_string) {
@@ -292,9 +291,6 @@ sub read_in_files (@inputs) {
 
     return @files;
 }
-
-# $ARGV[0] = 'resource/short-exam/IntroPerlEntryExamShort.txt'; 
-# $ARGV[1] = 'resource/short-exam/*';
 
 my $master_file = $ARGV[0];
 my @students_files = read_in_files(@ARGV[1..scalar(@ARGV)-1]);
