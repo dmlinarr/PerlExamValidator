@@ -65,7 +65,7 @@ sub print_score () {
                             $instead_answers{$filename_and_answer} = $instead_a;
                         }
                         else {
-                            # die eine antwort war falsch
+                            # Die eine Antwort war falsch
                             my $filename = $student->get_filename();
                             
                             if (not exists $cheaters{$filename}) {
@@ -77,19 +77,20 @@ sub print_score () {
                     }
                     else {
                         # Entweder keine antwort oder mehrere antworten gewaehlt
-                        my $filename = $student->get_filename();
-                        if (not exists $cheaters{$filename}) {
-                            $cheaters{$filename} = Cheating->new($filename);
-                        }
+                        
+                        # my $filename = $student->get_filename();
+                        # if (not exists $cheaters{$filename}) {
+                        #     $cheaters{$filename} = Cheating->new($filename);
+                        # }
 
-                        if (not @student_answers_marked) {
-                            $cheaters{$filename}->add_wrong_answer ($norm_question_master, undef);
-                        }
-                        else {
-                            for my $wrong_answer (@student_answers_marked) {
-                                $cheaters{$filename}->add_wrong_answer ($norm_question_master, $wrong_answer);
-                            }
-                        } 
+                        # if (not @student_answers_marked) {
+                        #    $cheaters{$filename}->add_wrong_answer ($norm_question_master, undef);
+                        # }
+                        # else {
+                        #     for my $wrong_answer (@student_answers_marked) {
+                        #         $cheaters{$filename}->add_wrong_answer ($norm_question_master, $wrong_answer);
+                        #     }
+                        # } 
                     }
 
                     # Überprüfe jetzt noch ob alle antworten beim studenten vorhanden sind
@@ -241,12 +242,23 @@ sub print_statistics () {
 }
 
 sub print_cheating ($question_amount, $answer_amount) {
-    print "TODO: Quest: $question_amount Answer: $answer_amount\n";
-    show %cheaters;
+    # show %cheaters;
+    my %log_history;
 
-    # for my $cheater (keys %wrong_answers) {
-    #    $cheater->check_if_I_am_cheater ($question_amount, $answer_amount, %cheaters)
-    # }
+    for my $cheater_file (sort keys %cheaters) {
+        
+        my $cheater = $cheaters{$cheater_file};
+        $cheater->check_if_I_am_cheater ($question_amount, $answer_amount, %cheaters);
+        
+        for my $log_name (keys %{$cheater->{log_cheater}}) {
+            unless (exists $log_history{$cheater_file} && $log_history{$cheater_file} ne $log_name) {
+                print $cheater->{log_cheater}{$log_name};
+                $log_history{$log_name} = $cheater_file;
+            }
+        }
+    }
+    print "Need to be checked";
+    show %log_history;
 }
 
 sub correct_according_distance ($master_string, $student_string) {
@@ -282,7 +294,7 @@ sub read_in_files (@inputs) {
 }
 
 # $ARGV[0] = 'resource/short-exam/IntroPerlEntryExamShort.txt'; 
-# $ARGV[1] = 'resource/short-exam/Marz_Jupiter.txt';
+# $ARGV[1] = 'resource/short-exam/*';
 
 my $master_file = $ARGV[0];
 my @students_files = read_in_files(@ARGV[1..scalar(@ARGV)-1]);
