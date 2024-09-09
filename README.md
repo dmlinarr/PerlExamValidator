@@ -17,3 +17,12 @@ perl src/Exam_Scorer.pl resource/normal-exam/IntroPerlEntryExam.txt resource/nor
 ```bash
 perl src/Exam_Scorer.pl resource/short-exam/IntroPerlEntryExamShort.txt resource/short-exam/*
 ```
+
+### Testing
+
+```bash
+perl t/Statistics.t 
+```
+
+Cheating.pm
+Exam_Reader.pm
