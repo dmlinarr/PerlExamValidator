@@ -1,0 +1,75 @@
+Complete this exam by placing an 'X' in the box beside each correct
+answer, like so:
+
+    [ ] This is not the correct answer
+    [ ] This is not the correct answer either
+    [ ] This is an incorrect answer
+    [X] This is the correct answer
+    [ ] This is an irrelevant answer
+
+Scoring: Each question is worth 2 points.
+         Final score will be: SUM / 10
+
+Warning: Each question has only one correct answer. Answers to
+         questions for which two or more boxes are marked with an 'X'
+         will be scored as zero.
+
+________________________________________________________________________________
+
+1. The Door:
+
+    [ ] Is open
+    [ ] Is closed
+    [ ] Is covered with blood
+    [X] Is covered with water
+    [ ] Is locked
+
+________________________________________________________________________________
+
+
+2. The capital center of switzerland is:
+
+    [X] Bern
+    [ ] Zürich
+    [ ] Basel
+    [ ] Berlin
+    [ ] Biel
+
+________________________________________________________________________________
+
+
+3. Today is the date:
+
+    [ ] To jump into the water
+    [ ] To eat a sandwich
+    [ ] To put the glasses on 
+    [ ] To delete my computer
+    [X] To throw away my computer
+
+________________________________________________________________________________
+
+
+4. Cats like:
+
+    [ ] To be treated kindly
+    [ ] To eat cat food
+    [ ] To walk outdoor in the woods
+    [ ] dogs who are calm
+    [X] humans who feed them 
+
+________________________________________________________________________________
+
+
+5. What is the meaning of life?
+
+    [ ] To work till you die
+    [X] To enjoy the sunlight
+    [ ] To walk great miles
+    [ ] To study computer science
+    [ ] To cry all day        
+
+
+
+================================================================================
+                                  END OF EXAM
+================================================================================

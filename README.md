@@ -28,4 +28,10 @@ perl t/Statistics.t
 perl t/Cheating.t
 ```
 
-Exam_Reader.pm
+```bash
+perl t/Exam_Reader.t
+```
+
+```bash
+perl -e 'for (glob "t/*.t") { system("perl $_") }'
+```
