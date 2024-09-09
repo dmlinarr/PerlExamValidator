@@ -24,5 +24,8 @@ perl src/Exam_Scorer.pl resource/short-exam/IntroPerlEntryExamShort.txt resource
 perl t/Statistics.t 
 ```
 
-Cheating.pm
+```bash
+perl t/Cheating.t
+```
+
 Exam_Reader.pm
