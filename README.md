@@ -41,3 +41,7 @@ perl -e 'for (glob "t/*.t") { system("perl $_") }'
 ```bash
 perldoc lib/Cheating.pm
 ```
+
+```bash
+perldoc lib/Regex.pm
+```
