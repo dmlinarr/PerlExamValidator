@@ -35,3 +35,9 @@ perl t/Exam_Reader.t
 ```bash
 perl -e 'for (glob "t/*.t") { system("perl $_") }'
 ```
+
+### Documentation
+
+```bash
+perldoc lib/Cheating.pm
+```
