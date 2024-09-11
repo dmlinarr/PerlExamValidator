@@ -45,3 +45,17 @@ perldoc lib/Cheating.pm
 ```bash
 perldoc lib/Regex.pm
 ```
+
+```bash
+perldoc lib/Exam_Writer.pm
+```
+
+```bash
+perldoc lib/Statistics.pm
+```
+
+Exam_Reader.pm
+Exam_Randomizer.pl
+Exam_Scorer.pl
+
+Technical Documentation
