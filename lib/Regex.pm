@@ -157,4 +157,7 @@ Damjan Mlinar "mlidam@hotmail.com"
 
 Copyright (c) 2024, Damjan Mlinar "mlidam@hotmail.com". All rights reserved. 
  
-This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself. 
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See L<perlartistic>. 
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
