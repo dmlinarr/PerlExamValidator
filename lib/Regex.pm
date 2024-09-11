@@ -60,7 +60,7 @@ our $LAYOUTSPLIT_PATTERN_REGEX = qr{^(.*?)(?:Q)(.*?)(?:A)(.*)$}s;
 
 =head1 NAME 
 
-Regex - Just a file with regex expression to import
+Regex - Just a file with regex expression to handle formatted multiple choice exams.
 
 =head1 SYNOPSIS 
     
