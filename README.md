@@ -58,7 +58,10 @@ perldoc lib/Statistics.pm
 perldoc src/Exam_Randomizer.pl 
 ```
 
-Exam_Reader.pm
+```bash
+perldoc lib/Exam_Reader.pm 
+```
+
 Exam_Scorer.pl
 
 Technical Documentation
