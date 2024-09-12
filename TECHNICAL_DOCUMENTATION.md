@@ -10,7 +10,6 @@ I agree with that point; however, I chose this data structure so that an `Exam_R
 Another advantage of using such a large data structure is that it simplifies querying. For example, for the `Exam_Randomizer`, I could easily query the corresponding line from `Exam_Reader` and write it to the output file without worrying about spaces, etc. To compare two exams, I used the normalized version of questions and answers. To neatly print these to the console, I retrieved their pretty versions.
 
 
-
 ```    
 class               => "Exam_Reader",
 filename            => "t/Test_Exam.txt",
@@ -115,7 +114,21 @@ printed_answer      => {
 ```
 
 ## 2. Fuzzy matching 
-why? example.
+First normalized form 
+1. Removes brackets (answer) or number (question).
+2. Removes leading and ending spaces.
+3. Removes line breaks.
+4. Removes multiple spaces between words and replaces them with one space.
+5. All characters to lower case.
+6. Removes stop words.
+
+Make example from string to string
+
+Second Levenshtein distance 
+
+Make example original string to similar string
+
+Third limitations -> Limitations (answers nextline, if # is in front etc) -> Limitation  (Remember $! and @!)
 
 ## 3. Colusion detection 
-why? example.
+Mathematical explanation on how to compare two students and decide if they cheated on the exam.
