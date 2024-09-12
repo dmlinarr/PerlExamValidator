@@ -1,7 +1,13 @@
 # Technical Documentation
 
 ## 1. Data structure 
-Text...
+The `Exam_Reader` is responsible for parsing multiple-choice exams into the data structure outlined below. For each loaded file, an `Exam_Reader` object is created, containing the following data, which is stored in a hashmap.
+
+As a data structure, this is quite extensive. Some might argue that it uses a lot of memory and that the purpose of `Exam_Reader` could be achieved with less data.
+
+I agree with that point; however, I chose this data structure so that an `Exam_Reader` object can be used for both the `Exam_Randomizer` and the `Exam_Scorer`. If I had used a different object for the `Exam_Scorer` than for the `Exam_Randomizer`, I would have had to write methods twice, which would lead to code redundancy.
+
+Another advantage of using such a large data structure is that it simplifies querying. For example, for the `Exam_Randomizer`, I could easily query the corresponding line from `Exam_Reader` and write it to the output file without worrying about spaces, etc. To compare two exams, I used the normalized version of questions and answers. To neatly print these to the console, I retrieved their pretty versions.
 
 
 
