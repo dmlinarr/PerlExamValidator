@@ -70,7 +70,7 @@ The first argument should specify the path to the master multiple choice exam fi
 
 =head1 DESCRIPTION
 
-This module reads a master multiple choice exam, randomizes the order of questions and answer options, 
+This application reads a master multiple choice exam, randomizes the order of questions and answer options, 
 and generates a new randomized exam file.
 The output file is named based on the current timestamp and the name of the master exam file.
 
