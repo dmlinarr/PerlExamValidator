@@ -147,9 +147,9 @@ The collusion detection mechanism compares the incorrect answers of a student wi
 The probability of cheating is determined by the ratio of matching incorrect answers to the total number of incorrect answers. If this probability exceeds 50%, and the student has a sufficient number of wrong answers relative to the total questions, the student is flagged for potential cheating.
 
 The formula for calculating the probability is:
-$$
+``m̀ath
 P = \left( \frac{I}{W} \right) \times 100
-$$
+```
 
 \( I \) is the number of identical incorrect answers,  
 \( W \) is the total number of incorrect answers given by the student,  
