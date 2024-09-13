@@ -114,21 +114,32 @@ printed_answer      => {
 ```
 
 ## 2. Fuzzy matching 
-First normalized form 
-1. Removes brackets (answer) or number (question).
-2. Removes leading and ending spaces.
+To evaluate the completed multiple-choice exams, the marked answers must be compared with the correct answers from the master file. There were instances where some of the completed multiple-choice exams deviated from the original template, for example, when some words in a question were written differently.
+
+To help `Exam_Scorer` recognize such deviations from the original, the questions and answers were simplified. First, the strings were normalized using the following steps:
+
+1. Removes brackets (answers) or numbers (questions).
+2. Removes leading and trailing spaces.
 3. Removes line breaks.
-4. Removes multiple spaces between words and replaces them with one space.
-5. All characters to lower case.
+4. Replaces multiple spaces between words with a single space.
+5. Converts all characters to lowercase.
 6. Removes stop words.
 
-Make example from string to string
+For example:
+```
+"    [ ] To throw away my computer\n" becomes "throw away computer" in the normalized form.
+```
 
-Second Levenshtein distance 
+To allow similar questions or answers to be accepted, the original and the deviation were compared using the Levenshtein distance. The Levenshtein distance measures how many single-character edits—insertions, deletions, or substitutions are required to transform one string into another.
 
-Make example original string to similar string
+The deviation was accepted if the edit distance was less than or equal to 10% of the length of the original string.
 
-Third limitations -> Limitations (answers nextline, if # is in front etc) -> Limitation  (Remember $! and @!)
+For example:
+```
+"today date#" is accepted as "today date:"
+```
+
+However, this type of matching also has disadvantages. For instance, a slightly different answer could be accepted even if it is actually incorrect and happens to match another incorrect answer option.
 
 ## 3. Colusion detection 
 Mathematical explanation on how to compare two students and decide if they cheated on the exam.
