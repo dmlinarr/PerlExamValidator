@@ -1,6 +1,6 @@
 # Technical Documentation
 
-## 1. Data structure 
+## 1. Data Structure 
 The `Exam_Reader` is responsible for parsing multiple-choice exams into the data structure outlined below. For each loaded file, an `Exam_Reader` object is created, containing the following data, which is stored in a hashmap.
 
 As a data structure, this is quite extensive. Some might argue that it uses a lot of memory and that the purpose of `Exam_Reader` could be achieved with less data.
@@ -113,7 +113,7 @@ printed_answer      => {
                         }
 ```
 
-## 2. Fuzzy matching 
+## 2. Fuzzy Matching 
 To evaluate the completed multiple-choice exams, the marked answers must be compared with the correct answers from the master file. There were instances where some of the completed multiple-choice exams deviated from the original template, for example, when some words in a question were written differently.
 
 To help `Exam_Scorer` recognize such deviations from the original, the questions and answers were simplified. First, the strings were normalized using the following steps:
@@ -140,6 +140,17 @@ For example:
 ```
 
 However, this type of matching also has disadvantages. For instance, a slightly different answer could be accepted even if it is actually incorrect and happens to match another incorrect answer option.
+ 
+## 3. Collusion Detection 
+The collusion detection mechanism compares the incorrect answers of a student with those of their peers to estimate the likelihood of cheating. The algorithm begins by identifying how many questions a student answered incorrectly and then checks whether any of these incorrect answers match with those of other students.
 
-## 3. Colusion detection 
-Mathematical explanation on how to compare two students and decide if they cheated on the exam.
+The probability of cheating is determined by the ratio of matching incorrect answers to the total number of incorrect answers. If this probability exceeds 50%, and the student has a sufficient number of wrong answers relative to the total questions, the student is flagged for potential cheating.
+
+The formula for calculating the probability is:
+```latex
+P = \left( \frac{I}{W} \right) \times 100
+```
+
+\( I \) is the number of identical incorrect answers,  
+\( W \) is the total number of incorrect answers given by the student,  
+\( P \) is the calculated probability as a percentage.
