@@ -7,7 +7,7 @@ use Test::More;
 use Exam_Reader;
 
 # load_file
-my $reader = Exam_Reader->new('t/Test_Exam.txt');
+my $reader = Exam_Reader->new('./resource/test-exam/Test_Exam.txt');
 
 # question_through_num
 is($reader->question_through_num(3),"today date:","question_through_num");
