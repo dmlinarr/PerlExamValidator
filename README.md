@@ -1,51 +1,22 @@
-# Applications 
+# Perl Exam Validator Tool
 
-Please use these two commands to learn how to use the applications:
+This project provides a suite of Perl scripts for managing multiple-choice exams, including randomization, scoring, and basic collusion detection.
 
-```bash
-perldoc src/Exam_Randomizer.pl 
-```
+## Applications
 
-```bash
-perldoc src/Exam_Scorer.pl
-```
+The following applications are included:
 
-# Modules
+* **`Exam_Randomizer.pl`**: Reads a master multiple-choice exam file and generates a randomized version of the exam.
+    
+    **Usage:**
+    ```bash
+    perldoc src/Exam_Randomizer.pl
+    ```
+    
 
-Please use these five commands to learn how to use the modules:
-
-```bash
-perldoc lib/Cheating.pm
-```
-
-```bash
-perldoc lib/Regex.pm
-```
-
-```bash
-perldoc lib/Exam_Writer.pm
-```
-
-```bash
-perldoc lib/Statistics.pm
-```
-
-```bash
-perldoc lib/Exam_Reader.pm 
-```
-
-# Testing
-
-Please use these three commands to test the modules:
-
-```bash
-perl t/Statistics.t 
-```
-
-```bash
-perl t/Cheating.t
-```
-
-```bash
-perl t/Exam_Reader.t
-```
+* **`Exam_Scorer.pl`**: Evaluates completed multiple-choice exams against a master exam file, providing scores, identifying incorrect answers, and detecting potential cheating.
+    
+    **Usage:**
+    ```bash
+    perldoc src/Exam_Scorer.pl
+    ```
